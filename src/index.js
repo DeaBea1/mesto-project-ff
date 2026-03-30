@@ -9,11 +9,16 @@ const popups = Array.from(document.querySelectorAll('.popup'));
 const profileTitle = document.querySelector('.profile__title');
 const profileDescription = document.querySelector('.profile__description');
 const editProfileButton = document.querySelector('.profile__edit-button');
+const addCardButton = document.querySelector('.profile__add-button');
 const editProfilePopup = document.querySelector('.popup_type_edit');
+const newCardPopup = document.querySelector('.popup_type_new-card');
 const closeButtons = document.querySelectorAll('.popup__close');
 const editProfileForm = document.forms['edit-profile'];
+const addCardForm = document.forms['new-place'];
 const nameInput = editProfileForm.elements.name;
 const jobInput = editProfileForm.elements.description;
+const cardNameInput = addCardForm.elements['place-name'];
+const cardLinkInput = addCardForm.elements.link;
 const logoUrl = new URL('./images/logo.svg', import.meta.url);
 const avatarUrl = new URL('./images/avatar.jpg', import.meta.url);
 
@@ -81,6 +86,23 @@ function handleEditProfileClick() {
     openModal(editProfilePopup);
 }
 
+function handleAddCardClick() {
+    openModal(newCardPopup);
+}
+
+function handleAddCardFormSubmit(evt) {
+    evt.preventDefault();
+
+    const newCard = {
+        name: cardNameInput.value,
+        link: cardLinkInput.value
+    };
+
+    placesList.prepend(createCard(newCard, deleteCard));
+    addCardForm.reset();
+    closeModal(newCardPopup);
+}
+
 popups.forEach((popup) => {
     popup.classList.add('popup_is-animated');
     popup.addEventListener('click', (evt) => {
@@ -98,7 +120,9 @@ closeButtons.forEach((closeButton) => {
 });
 
 editProfileButton.addEventListener('click', handleEditProfileClick);
+addCardButton.addEventListener('click', handleAddCardClick);
 editProfileForm.addEventListener('submit', handleProfileFormSubmit);
+addCardForm.addEventListener('submit', handleAddCardFormSubmit);
 
 // @todo: Вывести карточки на страницу
 initialCards.forEach((cardData) => {
