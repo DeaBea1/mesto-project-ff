@@ -1,5 +1,15 @@
+import { initialCards } from './cards.js'
+import './styles/index.css'
+
 // @todo: Темплейт карточки
 const cardTemplate = document.querySelector('#card-template').content;
+const headerLogo = document.querySelector('.header__logo');
+const profileImage = document.querySelector('.profile__image');
+const logoUrl = new URL('./images/logo.svg', import.meta.url);
+const avatarUrl = new URL('./images/avatar.jpg', import.meta.url);
+
+headerLogo.src = logoUrl.href;
+profileImage.style.backgroundImage = `url('${avatarUrl.href}')`;
 
 // @todo: DOM узлы
 const placesList = document.querySelector('.places__list');
