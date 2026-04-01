@@ -63,41 +63,16 @@ function renderCard(cardData, method = 'append') {
   const cardElement = createCard(
     cardData,
     currentUserId,
-    handleDeleteCardClick,
-    handleLikeCardClick,
     openImagePopup,
+    deleteCard,
+    addLike,
+    deleteLike,
+    (err) => {
+      console.log(err);
+    },
     cardTemplate
   );
   placesList[method](cardElement);
-}
-
-function handleDeleteCardClick(cardData, cardElement) {
-  deleteCard(cardData._id)
-    .then(() => {
-      cardElement.remove();
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-}
-
-function setLikeState(likeButton, likeCounter, updatedCardData) {
-  const isLikedByCurrentUser = updatedCardData.likes.some((likeUser) => likeUser._id === currentUserId);
-  likeButton.classList.toggle('card__like-button_is-active', isLikedByCurrentUser);
-  likeCounter.textContent = updatedCardData.likes.length;
-}
-
-function handleLikeCardClick(cardData, likeButton, likeCounter) {
-  const isLiked = likeButton.classList.contains('card__like-button_is-active');
-  const likeRequest = isLiked ? deleteLike(cardData._id) : addLike(cardData._id);
-
-  likeRequest
-    .then((updatedCardData) => {
-      setLikeState(likeButton, likeCounter, updatedCardData);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
 }
 
 function handleProfileFormSubmit(evt) {
