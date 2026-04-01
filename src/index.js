@@ -1,8 +1,8 @@
-import { initialCards } from './cards.js';
-import { createCard, handleDeleteCard, handleLikeCard } from './components/card.js';
-import { openModal, closeModal, setModalEventListeners } from './components/modal.js';
-import { enableValidation, clearValidation } from './components/validation.js';
-import './styles/index.css';
+import { getInitialCards, getUserInfo } from './components/api.js'
+import { createCard, handleDeleteCard, handleLikeCard } from './components/card.js'
+import { closeModal, openModal, setModalEventListeners } from './components/modal.js'
+import { clearValidation, enableValidation } from './components/validation.js'
+import './styles/index.css'
 
 const cardTemplate = document.querySelector('#card-template').content;
 const placesList = document.querySelector('.places__list');
@@ -10,7 +10,6 @@ const placesList = document.querySelector('.places__list');
 const headerLogo = document.querySelector('.header__logo');
 const profileImage = document.querySelector('.profile__image');
 const logoUrl = new URL('./images/logo.svg', import.meta.url);
-const avatarUrl = new URL('./images/avatar.jpg', import.meta.url);
 
 const profileTitle = document.querySelector('.profile__title');
 const profileDescription = document.querySelector('.profile__description');
@@ -41,7 +40,6 @@ const validationConfig = {
 };
 
 headerLogo.src = logoUrl.href;
-profileImage.style.backgroundImage = `url('${avatarUrl.href}')`;
 
 function openImagePopup(cardData) {
   popupImage.src = cardData.link;
@@ -105,6 +103,16 @@ editProfileForm.addEventListener('submit', handleProfileFormSubmit);
 addCardForm.addEventListener('submit', handleAddCardFormSubmit);
 enableValidation(validationConfig);
 
-initialCards.forEach((cardData) => {
-  renderCard(cardData);
-});
+Promise.all([getUserInfo(), getInitialCards()])
+  .then(([userData, cards]) => {
+    profileTitle.textContent = userData.name;
+    profileDescription.textContent = userData.about;
+    profileImage.style.backgroundImage = `url('${userData.avatar}')`;
+
+    cards.forEach((cardData) => {
+      renderCard(cardData);
+    });
+  })
+  .catch((err) => {
+    console.log(err);
+  });
