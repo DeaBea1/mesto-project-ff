@@ -1,4 +1,4 @@
-import { addCard, addLike, deleteCard, deleteLike, getInitialCards, getUserInfo, updateUserInfo } from './components/api.js'
+import { addCard, addLike, deleteCard, deleteLike, getInitialCards, getUserInfo, updateAvatar, updateUserInfo } from './components/api.js'
 import { createCard } from './components/card.js'
 import { closeModal, openModal, setModalEventListeners } from './components/modal.js'
 import { clearValidation, enableValidation } from './components/validation.js'
@@ -19,16 +19,22 @@ const popups = Array.from(document.querySelectorAll('.popup'));
 
 const editProfilePopup = document.querySelector('.popup_type_edit');
 const newCardPopup = document.querySelector('.popup_type_new-card');
+const editAvatarPopup = document.querySelector('.popup_type_edit-avatar');
 const imagePopup = document.querySelector('.popup_type_image');
 const popupImage = imagePopup.querySelector('.popup__image');
 const popupCaption = imagePopup.querySelector('.popup__caption');
 
 const editProfileForm = document.forms['edit-profile'];
 const addCardForm = document.forms['new-place'];
+const editAvatarForm = document.forms['edit-avatar'];
 const nameInput = editProfileForm.elements.name;
 const jobInput = editProfileForm.elements.description;
 const cardNameInput = addCardForm.elements['place-name'];
 const cardLinkInput = addCardForm.elements.link;
+const avatarInput = editAvatarForm.elements.avatar;
+const profileSubmitButton = editProfileForm.querySelector('.popup__button');
+const addCardSubmitButton = addCardForm.querySelector('.popup__button');
+const avatarSubmitButton = editAvatarForm.querySelector('.popup__button');
 let currentUserId = '';
 
 const validationConfig = {
@@ -47,6 +53,10 @@ function openImagePopup(cardData) {
   popupImage.alt = cardData.name;
   popupCaption.textContent = cardData.name;
   openModal(imagePopup);
+}
+
+function renderLoading(isLoading, buttonElement, defaultText) {
+  buttonElement.textContent = isLoading ? 'Сохранение...' : defaultText;
 }
 
 function renderCard(cardData, method = 'append') {
@@ -92,6 +102,8 @@ function handleLikeCardClick(cardData, likeButton, likeCounter) {
 
 function handleProfileFormSubmit(evt) {
   evt.preventDefault();
+  renderLoading(true, profileSubmitButton, 'Сохранить');
+
   updateUserInfo(nameInput.value, jobInput.value)
     .then((userData) => {
       profileTitle.textContent = userData.name;
@@ -100,6 +112,9 @@ function handleProfileFormSubmit(evt) {
     })
     .catch((err) => {
       console.log(err);
+    })
+    .finally(() => {
+      renderLoading(false, profileSubmitButton, 'Сохранить');
     });
 }
 
@@ -117,6 +132,7 @@ function handleAddCardClick() {
 
 function handleAddCardFormSubmit(evt) {
   evt.preventDefault();
+  renderLoading(true, addCardSubmitButton, 'Сохранить');
 
   addCard(cardNameInput.value, cardLinkInput.value)
     .then((cardData) => {
@@ -127,6 +143,33 @@ function handleAddCardFormSubmit(evt) {
     })
     .catch((err) => {
       console.log(err);
+    })
+    .finally(() => {
+      renderLoading(false, addCardSubmitButton, 'Сохранить');
+    });
+}
+
+function handleAvatarClick() {
+  editAvatarForm.reset();
+  clearValidation(editAvatarForm, validationConfig);
+  openModal(editAvatarPopup);
+}
+
+function handleAvatarFormSubmit(evt) {
+  evt.preventDefault();
+  renderLoading(true, avatarSubmitButton, 'Сохранить');
+
+  updateAvatar(avatarInput.value)
+    .then((userData) => {
+      profileImage.style.backgroundImage = `url('${userData.avatar}')`;
+      closeModal(editAvatarPopup);
+      editAvatarForm.reset();
+    })
+    .catch((err) => {
+      console.log(err);
+    })
+    .finally(() => {
+      renderLoading(false, avatarSubmitButton, 'Сохранить');
     });
 }
 
@@ -137,8 +180,10 @@ popups.forEach((popup) => {
 
 editProfileButton.addEventListener('click', handleEditProfileClick);
 addCardButton.addEventListener('click', handleAddCardClick);
+profileImage.addEventListener('click', handleAvatarClick);
 editProfileForm.addEventListener('submit', handleProfileFormSubmit);
 addCardForm.addEventListener('submit', handleAddCardFormSubmit);
+editAvatarForm.addEventListener('submit', handleAvatarFormSubmit);
 enableValidation(validationConfig);
 
 Promise.all([getUserInfo(), getInitialCards()])

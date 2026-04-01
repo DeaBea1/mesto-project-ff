@@ -69,7 +69,15 @@ function deleteLike(cardId) {
   }).then(checkResponse);
 }
 
+function updateAvatar(avatar) {
+  return fetch(`${apiConfig.baseUrl}/users/me/avatar`, {
+    method: 'PATCH',
+    headers: apiConfig.headers,
+    body: JSON.stringify({ avatar })
+  }).then(checkResponse);
+}
+
 export {
-  addCard, addLike, deleteCard, deleteLike, getInitialCards, getUserInfo, updateUserInfo
+  addCard, addLike, deleteCard, deleteLike, getInitialCards, getUserInfo, updateAvatar, updateUserInfo
 }
 
