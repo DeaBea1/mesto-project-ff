@@ -26,4 +26,26 @@ function getInitialCards() {
   }).then(checkResponse);
 }
 
-export { getUserInfo, getInitialCards };
+function updateUserInfo(name, about) {
+  return fetch(`${apiConfig.baseUrl}/users/me`, {
+    method: 'PATCH',
+    headers: apiConfig.headers,
+    body: JSON.stringify({
+      name,
+      about
+    })
+  }).then(checkResponse);
+}
+
+function addCard(name, link) {
+  return fetch(`${apiConfig.baseUrl}/cards`, {
+    method: 'POST',
+    headers: apiConfig.headers,
+    body: JSON.stringify({
+      name,
+      link
+    })
+  }).then(checkResponse);
+}
+
+export { getUserInfo, getInitialCards, updateUserInfo, addCard };

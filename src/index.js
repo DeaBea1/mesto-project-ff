@@ -1,4 +1,4 @@
-import { getInitialCards, getUserInfo } from './components/api.js'
+import { addCard, getInitialCards, getUserInfo, updateUserInfo } from './components/api.js'
 import { createCard, handleDeleteCard, handleLikeCard } from './components/card.js'
 import { closeModal, openModal, setModalEventListeners } from './components/modal.js'
 import { clearValidation, enableValidation } from './components/validation.js'
@@ -61,9 +61,15 @@ function renderCard(cardData, method = 'append') {
 
 function handleProfileFormSubmit(evt) {
   evt.preventDefault();
-  profileTitle.textContent = nameInput.value;
-  profileDescription.textContent = jobInput.value;
-  closeModal(editProfilePopup);
+  updateUserInfo(nameInput.value, jobInput.value)
+    .then((userData) => {
+      profileTitle.textContent = userData.name;
+      profileDescription.textContent = userData.about;
+      closeModal(editProfilePopup);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 }
 
 function handleEditProfileClick() {
@@ -81,15 +87,16 @@ function handleAddCardClick() {
 function handleAddCardFormSubmit(evt) {
   evt.preventDefault();
 
-  const newCard = {
-    name: cardNameInput.value,
-    link: cardLinkInput.value
-  };
-
-  renderCard(newCard, 'prepend');
-  addCardForm.reset();
-  clearValidation(addCardForm, validationConfig);
-  closeModal(newCardPopup);
+  addCard(cardNameInput.value, cardLinkInput.value)
+    .then((cardData) => {
+      renderCard(cardData, 'prepend');
+      addCardForm.reset();
+      clearValidation(addCardForm, validationConfig);
+      closeModal(newCardPopup);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 }
 
 popups.forEach((popup) => {
