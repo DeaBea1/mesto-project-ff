@@ -48,4 +48,28 @@ function addCard(name, link) {
   }).then(checkResponse);
 }
 
-export { getUserInfo, getInitialCards, updateUserInfo, addCard };
+function deleteCard(cardId) {
+  return fetch(`${apiConfig.baseUrl}/cards/${cardId}`, {
+    method: 'DELETE',
+    headers: apiConfig.headers
+  }).then(checkResponse);
+}
+
+function addLike(cardId) {
+  return fetch(`${apiConfig.baseUrl}/cards/likes/${cardId}`, {
+    method: 'PUT',
+    headers: apiConfig.headers
+  }).then(checkResponse);
+}
+
+function deleteLike(cardId) {
+  return fetch(`${apiConfig.baseUrl}/cards/likes/${cardId}`, {
+    method: 'DELETE',
+    headers: apiConfig.headers
+  }).then(checkResponse);
+}
+
+export {
+  addCard, addLike, deleteCard, deleteLike, getInitialCards, getUserInfo, updateUserInfo
+}
+

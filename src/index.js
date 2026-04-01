@@ -1,5 +1,5 @@
-import { addCard, getInitialCards, getUserInfo, updateUserInfo } from './components/api.js'
-import { createCard, handleDeleteCard, handleLikeCard } from './components/card.js'
+import { addCard, addLike, deleteCard, deleteLike, getInitialCards, getUserInfo, updateUserInfo } from './components/api.js'
+import { createCard } from './components/card.js'
 import { closeModal, openModal, setModalEventListeners } from './components/modal.js'
 import { clearValidation, enableValidation } from './components/validation.js'
 import './styles/index.css'
@@ -29,6 +29,7 @@ const nameInput = editProfileForm.elements.name;
 const jobInput = editProfileForm.elements.description;
 const cardNameInput = addCardForm.elements['place-name'];
 const cardLinkInput = addCardForm.elements.link;
+let currentUserId = '';
 
 const validationConfig = {
   formSelector: '.popup__form',
@@ -51,12 +52,42 @@ function openImagePopup(cardData) {
 function renderCard(cardData, method = 'append') {
   const cardElement = createCard(
     cardData,
-    handleDeleteCard,
-    handleLikeCard,
+    currentUserId,
+    handleDeleteCardClick,
+    handleLikeCardClick,
     openImagePopup,
     cardTemplate
   );
   placesList[method](cardElement);
+}
+
+function handleDeleteCardClick(cardData, cardElement) {
+  deleteCard(cardData._id)
+    .then(() => {
+      cardElement.remove();
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+
+function setLikeState(likeButton, likeCounter, updatedCardData) {
+  const isLikedByCurrentUser = updatedCardData.likes.some((likeUser) => likeUser._id === currentUserId);
+  likeButton.classList.toggle('card__like-button_is-active', isLikedByCurrentUser);
+  likeCounter.textContent = updatedCardData.likes.length;
+}
+
+function handleLikeCardClick(cardData, likeButton, likeCounter) {
+  const isLiked = likeButton.classList.contains('card__like-button_is-active');
+  const likeRequest = isLiked ? deleteLike(cardData._id) : addLike(cardData._id);
+
+  likeRequest
+    .then((updatedCardData) => {
+      setLikeState(likeButton, likeCounter, updatedCardData);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 }
 
 function handleProfileFormSubmit(evt) {
@@ -112,6 +143,7 @@ enableValidation(validationConfig);
 
 Promise.all([getUserInfo(), getInitialCards()])
   .then(([userData, cards]) => {
+    currentUserId = userData._id;
     profileTitle.textContent = userData.name;
     profileDescription.textContent = userData.about;
     profileImage.style.backgroundImage = `url('${userData.avatar}')`;
